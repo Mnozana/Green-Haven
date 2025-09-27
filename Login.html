@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Haven Login</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <header>
+        <div class="logo">Green Haven</div>
+        <nav>
+            <ul>
+                <li><a href="login.html" class="active">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="login-container">
+        <section class="login-hero" style="background-image: url('images/cover.jpg')">
+            <div class="login-overlay"></div>
+            <div class="login-content">
+                <h1>Welcome Back to Green Haven</h1>
+                <p>Please login to access your gardening resources</p>
+            </div>
+        </section>
+
+        <section class="login-form-section">
+            <div class="login-form-container">
+                <h2>Member Login</h2>
+                <form class="login-form" action="index.html" method="GET" id="loginForm">
+                    <div class="form-group">
+                        <label for="haven-id">Haven ID</label>
+                        <input type="text" id="haven-id" name="haven-id" placeholder="Enter your Haven ID" required>
+                        <div id="id-error" class="error-message" style="display: none;">
+                            Invalid ID
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <div id="password-error" class="error-message" style="display: none;">
+                            Incorrect Password
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="verification-code">Haven Verification Code</label>
+                        <input type="text" id="verification-code" name="verification-code" placeholder="Enter 4-digit code" 
+                               pattern="\d{4}" maxlength="4" required
+                               oninput="this.value = this.value.replace(/[^0-9]/g, ''); validateVerificationCode(this)">
+                        <small>Check your registered email for the code</small>
+                        <div id="verification-error" class="error-message" style="display: none;">
+                            Incorrect Verification Code
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                        <a href="forgot-password.html" class="forgot-password">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="login-button">Login to Your Haven</button>
+                    
+                    <div class="register-link">
+                        <p>Don't have an account? <a href="signup.html">Create Haven ID</a></p>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Welcome Animation Overlay -->
+    <div class="welcome-animation" id="welcomeAnimation">
+        <div class="welcome-icon">🌿</div>
+        <h2 class="welcome-message">Welcome Back, Gardener!</h2>
+        <p class="welcome-submessage">We're redirecting you to your personal haven</p>
+        <div class="countdown" id="countdown">7</div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Green Haven Gardening. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Define the correct credentials
+        const CORRECT_ID = "Haven2025";
+        const CORRECT_PASSWORD = "Green@H4";
+        const CORRECT_VERIFICATION_CODE = "2025";
+
+        function validateVerificationCode(input) {
+            const errorElement = document.getElementById('verification-error');
+            const code = input.value;
+            
+            // Show error if not exactly 4 digits (when field has value)
+            if (code.length > 0 && code.length !== 4) {
+                errorElement.style.display = 'block';
+                errorElement.textContent = 'Invalid verification code. Must be exactly 4 numbers.';
+                input.setCustomValidity('Invalid verification code');
+            } else {
+                errorElement.style.display = 'none';
+                input.setCustomValidity('');
+            }
+        }
+
+        // Add form validation on submit
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Always prevent default to handle validation ourselves
+            
+            // Get input values
+            const havenId = document.getElementById('haven-id').value;
+            const password = document.getElementById('password').value;
+            const verificationCode = document.getElementById('verification-code').value;
+            
+            // Get error elements
+            const idError = document.getElementById('id-error');
+            const passwordError = document.getElementById('password-error');
+            const verificationError = document.getElementById('verification-error');
+            
+            // Reset error messages
+            idError.style.display = 'none';
+            passwordError.style.display = 'none';
+            verificationError.style.display = 'none';
+            
+            let isValid = true;
+            
+            // Validate Haven ID
+            if (havenId !== CORRECT_ID) {
+                idError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate Password
+            if (password !== CORRECT_PASSWORD) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate Verification Code
+            if (verificationCode !== CORRECT_VERIFICATION_CODE) {
+                verificationError.style.display = 'block';
+                verificationError.textContent = 'Incorrect Verification Code';
+                isValid = false;
+            } else if (verificationCode.length !== 4) {
+                verificationError.style.display = 'block';
+                verificationError.textContent = 'Invalid verification code. Must be exactly 4 numbers.';
+                isValid = false;
+            }
+            
+            // If all credentials are correct, show welcome animation
+            if (isValid) {
+                const welcomeAnimation = document.getElementById('welcomeAnimation');
+                const countdownElement = document.getElementById('countdown');
+                
+                // Show the welcome animation
+                welcomeAnimation.classList.add('active');
+                
+                // Start countdown from 7 seconds
+                let seconds = 7;
+                countdownElement.textContent = seconds;
+                
+                const countdownInterval = setInterval(() => {
+                    seconds--;
+                    countdownElement.textContent = seconds;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdownInterval);
+                        // Redirect to index.html after 7 seconds
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

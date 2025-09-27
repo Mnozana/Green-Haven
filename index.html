@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Haven Gardening</title>
+    <link rel="stylesheet" href="home.css">
+    <style>
+        /* Additional styles for clickable feature cards */
+        .feature-card {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        .feature-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Success message styles */
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.7s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Green Haven</div>
+        <nav>
+		  <ul class="main-menu">
+			<li class="active"><a href="index.html">Home</a></li>
+			<li><a href="team.html">Team</a></li>
+			<li><a href="challenges.html">Challenges</a></li>
+			<li><a href="solutions.html">Solutions</a></li>
+			<li class="dropdown">
+			  <a href="#">Resources</a>
+			  <ul class="dropdown-menu">
+				<li><a href="irrigation.html">Irrigation Systems</a></li>
+				<li><a href="calculator.html">Calculator</a></li>
+				<li><a href="land-sale.html">Land Sale</a></li>
+			  </ul>
+			</li>
+			<li><a href="glossary.html">Glossary</a></li>
+		  </ul>
+		</nav>
+    </header>
+
+    <main>
+       <section class="hero" style="background-image: url('images/cover.jpg')">
+            <div class="hero-content">
+                <h1>Welcome to Green Haven</h1>
+                <p>"One vision, many hands, shared success."</p>
+                <a href="solutions.html" class="cta-button">Dive in</a>
+            </div>
+        </section>
+
+        <!-- Mission Statement Section -->
+        <section class="mission-section">
+            <h2>Our Mission</h2>
+            <div class="mission-content">
+                <p><span class="mission-highlight">Green Haven Gardening</span> is dedicated to empowering gardeners and agricultural enthusiasts with comprehensive resources, tools, and solutions for sustainable gardening practices. We provide expert guidance on efficient irrigation systems, land acquisition opportunities, and practical calculators to optimize water usage and plant health.</p>
+                <p>Our mission is to make gardening accessible, efficient, and environmentally conscious for everyone from home gardeners to commercial farmers.</p>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose Us</h2>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="window.location.href='team.html'">
+                    <a href="team.html">
+                        <img src="images/team.jpg" alt="Expert Team">
+                        <h3>Expert Team</h3>
+                        <p>Learn from our passionate gardening professionals</p>
+                    </a>
+                </div>
+                <div class="feature-card" onclick="window.location.href='challenges.html'">
+                    <a href="challenges.html">
+                        <img src="images/challenge.jpg" alt="Common Challenges">
+                        <h3>Common Challenges</h3>
+                        <p>Solutions for typical gardening problems</p>
+                    </a>
+                </div>
+                <div class="feature-card" onclick="window.location.href='solutions.html'">
+                    <a href="solutions.html">
+                        <img src="images/solution.jpg" alt="Practical Solutions">
+                        <h3>Practical Solutions</h3>
+                        <p>Actionable advice for your garden</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials">
+            <h2>What Our Community Says</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Green Haven transformed my backyard into a thriving vegetable garden. The irrigation calculator saved me 40% on water bills!"</p>
+                        <div class="testimonial-author">- Sarah M., Home Gardener</div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"The expert advice helped our community garden flourish. Highly recommended for both beginners and experts."</p>
+                        <div class="testimonial-author">- David T., Community Garden Coordinator</div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"As a commercial farmer, the land acquisition resources were invaluable for expanding our operations sustainably."</p>
+                        <div class="testimonial-author">- Maria L., Organic Farm Owner</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter">
+            <div class="newsletter-content">
+                <h2>Stay Updated with Green Tips</h2>
+                <p>Subscribe to our newsletter for monthly gardening insights and exclusive resources</p>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" placeholder="Enter your email" required id="emailInput">
+                    <button type="submit" class="cta-button">Subscribe</button>
+                </form>
+                <div class="success-message" id="successMessage">
+                    Thank you for subscribing! You're now on our list and will start receiving updates soon.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Green Haven Gardening. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Newsletter subscription functionality
+        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent form from actually submitting
+            
+            const emailInput = document.getElementById('emailInput');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Simple email validation
+            const email = emailInput.value.trim();
+            if (!email) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Show success message
+            successMessage.classList.add('show');
+            
+            // Clear the input field
+            emailInput.value = '';
+            
+            // Hide the success message after 5 seconds
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 5000);
+        });
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</body>
+</html>
