@@ -12,7 +12,7 @@
         <div class="logo">Green Haven</div>
         <nav>
             <ul>
-                <li><a href="login.html">Login</a></li>
+                <li><a href="index.html">Login</a></li>
                 <li><a href="signup.html" class="active">Sign Up</a></li>
             </ul>
         </nav>
@@ -81,7 +81,7 @@
                     <button type="submit" class="signup-button">Create Your Haven Account</button>
                     
                     <div class="login-link">
-                        <p>Already have an account? <a href="login.html">Login to Your Haven</a></p>
+                        <p>Already have an account? <a href="index.html">Login to Your Haven</a></p>
                     </div>
                 </form>
             </div>
@@ -143,7 +143,7 @@
                 const interval = setInterval(() => {
                     if (width >= 100) {
                         clearInterval(interval);
-                        window.location.href = 'index.html';
+                        window.location.href = 'home.html';
                     } else {
                         width++;
                         progressBar.style.width = width + '%';
