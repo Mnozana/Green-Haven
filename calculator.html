@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegetable Watering Calculator | Green Haven Gardening</title>
+	<link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="calculator.css">
+    <style>
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Green Haven</div>
+        <nav>
+            <ul class="main-menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="team.html">Team</a></li>
+                <li><a href="challenges.html">Challenges</a></li>
+                <li><a href="solutions.html">Solutions</a></li>
+                <li class="dropdown">
+                    <a href="#">Resources</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="irrigation.html">Irrigation Systems</a></li>
+                        <li class="active"><a href="VegetableWateringCalculator.html">Calculator</a></li>
+                        <li><a href="land-sale.html">Land Sale</a></li>
+                    </ul>
+                </li>
+                <li><a href="glossary.html">Glossary</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="calculator-container">
+            <h1>Vegetable Watering Calculator</h1>
+            <p>Determine the optimal water amount for your garden based on current temperature, soil conditions, and other factors. This calculator uses the Blaney-Criddle method for evapotranspiration estimation, adjusted for vegetable types and soil moisture.</p>
+            
+            <div class="calculator-form">
+                <div>
+                    <label for="temperature">Current Temperature (°C):</label>
+                    <input type="number" id="temperature" step="0.1" value="20" min="-20" max="50">
+                    <small>Enter temperature between -20°C and 50°C</small>
+                </div>
+                
+                <div>
+                    <label for="moisture">Current Soil Moisture (%):</label>
+                    <input type="number" id="moisture" step="0.1" value="50" min="0" max="100">
+                    <small>Enter soil moisture percentage (0-100%), measured or estimated</small>
+                </div>
+                
+                <div>
+                    <label for="vegetable">Vegetable Type:</label>
+                    <select id="vegetable">
+                        <option value="1.0">General Vegetable (Kc=1.0)</option>
+                        <option value="1.15">Tomatoes (Kc=1.15)</option>
+                        <option value="0.9">Lettuce (Kc=0.9)</option>
+                        <option value="0.95">Carrots (Kc=0.95)</option>
+                        <option value="1.05">Beans (Kc=1.05)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="soil">Soil Type:</label>
+                    <select id="soil">
+                        <option value="25">Sandy (low water holding)</option>
+                        <option value="50">Loamy (medium water holding)</option>
+                        <option value="60">Clay (high water holding)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="area">Garden Area (m²):</label>
+                    <input type="number" id="area" step="0.1" value="10" min="0">
+                    <small>Optional: For total water calculation</small>
+                </div>
+                
+                <button class="cta-button" onclick="calculateWater()">Calculate Water Needs</button>
+            </div>
+            
+            <div id="result" class="calculator-results" style="display: none;">
+                <h2>Watering Analysis</h2>
+                
+                <div class="result-item">
+                    <div class="reading">
+                        <div>Temperature:</div>
+                        <div><span id="tempDisplay"></span> °C</div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="reading">
+                        <div>Current Soil Moisture:</div>
+                        <div><span id="moistureDisplay"></span>%</div>
+                    </div>
+                    <div class="moisture-bar">
+                        <div class="moisture-level" id="moistureBar"></div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="reading">
+                        <div>Daily Evapotranspiration Loss:</div>
+                        <div><span id="lossDisplay"></span> mm</div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="reading">
+                        <div>Adjusted Moisture Level:</div>
+                        <div><span id="adjustedDisplay"></span>%</div>
+                    </div>
+                    <div class="moisture-bar">
+                        <div class="moisture-level" id="adjustedBar"></div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="reading">
+                        <div>Water Required per m²:</div>
+                        <div><span id="waterDisplay"></span> L/m²</div>
+                    </div>
+                </div>
+                
+                <div class="result-item" id="totalWaterItem" style="display: none;">
+                    <div class="reading">
+                        <div>Total Water Required:</div>
+                        <div><span id="totalWaterDisplay"></span> L</div>
+                    </div>
+                </div>
+                
+                <div class="temp-impact" id="tempImpact"></div>
+                
+                <div id="recommendation" class="alert"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Green Haven Gardening. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // p table from FAO, latitudes 0 to 60, months 0-11 (Jan-Dec)
+        const pTable = {
+            0: [0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27],
+            5: [0.27, 0.27, 0.27, 0.28, 0.28, 0.28, 0.28, 0.28, 0.28, 0.27, 0.27, 0.27],
+            10: [0.26, 0.27, 0.27, 0.28, 0.28, 0.29, 0.29, 0.28, 0.28, 0.27, 0.26, 0.26],
+            15: [0.26, 0.26, 0.27, 0.28, 0.29, 0.29, 0.29, 0.28, 0.28, 0.27, 0.26, 0.25],
+            20: [0.25, 0.26, 0.27, 0.28, 0.29, 0.30, 0.30, 0.29, 0.28, 0.26, 0.25, 0.25],
+            25: [0.24, 0.26, 0.27, 0.29, 0.30, 0.31, 0.31, 0.29, 0.28, 0.26, 0.25, 0.24],
+            30: [0.24, 0.25, 0.27, 0.29, 0.31, 0.32, 0.31, 0.30, 0.28, 0.26, 0.24, 0.23],
+            35: [0.23, 0.25, 0.27, 0.29, 0.31, 0.32, 0.32, 0.30, 0.28, 0.25, 0.23, 0.22],
+            40: [0.22, 0.24, 0.27, 0.30, 0.32, 0.34, 0.33, 0.31, 0.28, 0.25, 0.22, 0.21],
+            45: [0.20, 0.23, 0.27, 0.30, 0.34, 0.35, 0.34, 0.32, 0.28, 0.24, 0.21, 0.20],
+            50: [0.19, 0.23, 0.27, 0.31, 0.34, 0.36, 0.35, 0.32, 0.28, 0.24, 0.20, 0.18],
+            55: [0.17, 0.21, 0.26, 0.32, 0.36, 0.39, 0.38, 0.33, 0.28, 0.23, 0.18, 0.16],
+            60: [0.15, 0.20, 0.26, 0.32, 0.38, 0.41, 0.40, 0.34, 0.28, 0.22, 0.17, 0.13]
+        };
+
+        function getP(latitude, month) {
+            const lats = Object.keys(pTable).map(Number).sort((a,b)=>a-b);
+            let closestLat = lats.reduce((prev, curr) => Math.abs(curr - latitude) < Math.abs(prev - latitude) ? curr : prev);
+            return pTable[closestLat][month];
+        }
+
+        class VegetableWateringSystem {
+            static IDEAL_FRACTION = 0.8; // Bring to 80% of available water capacity
+            static ROOT_DEPTH_MM = 300; // Assumed root depth
+
+            static calculate(temperature, moisture, kc, aw, area) {
+                const month = new Date().getMonth(); // 0-11
+                // Fixed latitude for South Africa (average around 30°S, but using 30°N equivalent for calculations)
+                const latitude = 30;
+                const p = getP(latitude, month);
+                const t_f = temperature * 1.8 + 32;
+                const eto = p * (0.46 * t_f + 8); // mm/day
+                const etc = kc * eto; // mm/day
+
+                const current_available = (moisture / 100) * aw;
+                const adjusted_available = Math.max(0, current_available - etc);
+                const adjusted_moisture = (adjusted_available / aw) * 100;
+
+                const ideal_available = aw * this.IDEAL_FRACTION;
+                const water_needed_mm = Math.max(0, ideal_available - adjusted_available);
+                const water_per_m2 = water_needed_mm.toFixed(1); // L/m²
+                const total_water = area ? (water_needed_mm * area).toFixed(1) : null;
+
+                return {
+                    temperature,
+                    currentMoisture: moisture,
+                    moistureLoss: etc.toFixed(1),
+                    newMoistureLevel: adjusted_moisture.toFixed(1),
+                    waterNeeded: water_per_m2,
+                    totalWater: total_water
+                };
+            }
+        }
+
+        function calculateWater() {
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const moisture = parseFloat(document.getElementById('moisture').value);
+            const kc = parseFloat(document.getElementById('vegetable').value);
+            const aw = parseFloat(document.getElementById('soil').value);
+            const area = parseFloat(document.getElementById('area').value) || null;
+
+            if (isNaN(temperature) || isNaN(moisture)) {
+                alert("Please enter valid numerical values for temperature and moisture.");
+                return;
+            }
+
+            if (temperature < -20 || temperature > 50) {
+                alert("Temperature must be between -20°C and 50°C");
+                return;
+            }
+
+            if (moisture < 0 || moisture > 100) {
+                alert("Soil moisture must be between 0% and 100%");
+                return;
+            }
+
+            const results = VegetableWateringSystem.calculate(temperature, moisture, kc, aw, area);
+            const resultDiv = document.getElementById('result');
+
+            document.getElementById('tempDisplay').textContent = results.temperature.toFixed(1);
+            document.getElementById('moistureDisplay').textContent = results.currentMoisture.toFixed(1);
+            document.getElementById('lossDisplay').textContent = results.moistureLoss;
+            document.getElementById('adjustedDisplay').textContent = results.newMoistureLevel;
+            document.getElementById('waterDisplay').textContent = results.waterNeeded;
+
+            if (results.totalWater) {
+                document.getElementById('totalWaterDisplay').textContent = results.totalWater;
+                document.getElementById('totalWaterItem').style.display = 'block';
+            } else {
+                document.getElementById('totalWaterItem').style.display = 'none';
+            }
+
+            document.getElementById('moistureBar').style.width = `${results.currentMoisture}%`;
+            document.getElementById('adjustedBar').style.width = `${results.newMoistureLevel}%`;
+
+            const tempImpact = document.getElementById('tempImpact');
+            let impactText = "";
+            let color = "";
+            let bold = false;
+
+            if (temperature < 10) {
+                impactText = "Low temperature reduces evaporation and water needs.";
+            } else if (temperature > 40) {
+                impactText = "Extreme high temperature significantly increases evaporation and water requirements. WARNING: Extreme temperatures may damage plants!";
+                color = "#d32f2f";
+                bold = true;
+            } else if (temperature > 30) {
+                impactText = "High temperature increases evaporation and water requirements.";
+            } else {
+                impactText = "Moderate temperature has balanced impact on water needs.";
+            }
+
+            tempImpact.textContent = impactText;
+            tempImpact.style.color = color;
+            tempImpact.style.fontWeight = bold ? "bold" : "";
+
+            const recommendation = document.getElementById('recommendation');
+            const adjusted = results.newMoistureLevel;
+            let recText = "";
+            let recClass = "alert ";
+
+            if (adjusted < 25) {
+                recText = `CRITICAL: Soil is extremely dry! Water immediately. ${temperature > 25 ? "High temperatures are accelerating moisture loss." : ""}`;
+                recClass += "alert-warning";
+            } else if (adjusted < 35) {
+                recText = `Warning: Soil is dry. Water today. ${temperature > 25 ? "Elevated temperatures are increasing water requirements." : ""}`;
+                recClass += "alert-warning";
+            } else if (adjusted > 75) {
+                recText = `Warning: Soil is waterlogged! Avoid watering. ${temperature > 25 ? "Despite high temperatures, soil has sufficient moisture." : ""}`;
+                recClass += "alert-warning";
+            } else if (adjusted > 60) {
+                recText = `Soil moisture is good. ${temperature > 25 ? "Monitor closely as high temperatures may increase water needs." : "Maintain current watering schedule."}`;
+                recClass += "alert-info";
+            } else if (adjusted >= 45 && adjusted <= 55) {
+                recText = `Ideal moisture level maintained. ${temperature > 25 ? "High temperatures may require slightly more frequent watering." : ""}`;
+                recClass += "alert-success";
+            } else {
+                recText = `Soil moisture is adequate. ${temperature > 25 ? "Increase watering frequency due to high temperatures." : "Continue with normal watering schedule."}`;
+                recClass += "alert-info";
+            }
+
+            if (temperature > 40) {
+                recText += " Consider providing shade and extra water to protect plants from heat stress.";
+            }
+
+            recommendation.textContent = recText;
+            recommendation.className = recClass;
+
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
